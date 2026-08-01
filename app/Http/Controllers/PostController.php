@@ -5,13 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use App\Models\Like;
+use App\Models\Comment;
 use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
     public function index()
     {
-        $posts = Post::latest()->get();
+        $posts = Post::with('comments.user', 'likes')
+            ->latest()
+            ->get();
 
         return view('dashboard', compact('posts'));
     }
@@ -51,4 +54,19 @@ class PostController extends Controller
 
         return back();
     }
+
+    public function comment(Request $request, Post $post)
+{
+    $request->validate([
+        'comment' => 'required'
+    ]);
+
+    Comment::create([
+        'user_id' => Auth::id(),
+        'post_id' => $post->id,
+        'comment' => $request->comment
+    ]);
+
+    return back();
+}
 }

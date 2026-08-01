@@ -64,6 +64,34 @@
 
             </form>
 
+                        <hr>
+
+            <form action="{{ route('comment', $post->id) }}" method="POST">
+
+                @csrf
+
+                <input
+                    type="text"
+                    name="comment"
+                    placeholder="Tulis komentar">
+
+                <button type="submit">
+                    Kirim
+                </button>
+
+            </form>
+            @foreach($post->comments as $comment)
+
+            <p>
+
+                <b>{{ $comment->user->name }}</b>
+
+                : {{ $comment->comment }}
+
+            </p>
+
+        @endforeach
+
         </div>
 
     @endforeach

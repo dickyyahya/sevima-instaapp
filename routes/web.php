@@ -19,6 +19,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/like/{post}', [PostController::class, 'like'])
         ->name('like');
 
+    Route::post('/comment/{post}', [PostController::class, 'comment'])
+        ->name('comment');
+
 });
 
 Route::middleware('auth')->group(function () {
