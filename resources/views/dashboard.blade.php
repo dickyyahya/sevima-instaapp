@@ -1,98 +1,196 @@
 <x-app-layout>
 
-<div style="width:700px;margin:auto">
+<style>
+body{
+    background:#f3f4f6;
+    font-family:Arial, Helvetica, sans-serif;
+}
 
-    <h2>Upload Post</h2>
+.container{
+    width:700px;
+    margin:30px auto;
+}
 
-    @if(session('success'))
-        <p style="color:green">
-            {{ session('success') }}
-        </p>
-    @endif
+.card{
+    background:#fff;
+    border-radius:10px;
+    padding:20px;
+    margin-bottom:25px;
+    box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
 
-    <form action="{{ route('upload') }}"
-          method="POST"
-          enctype="multipart/form-data">
+h2{
+    margin-bottom:15px;
+}
 
-        @csrf
+textarea,
+input[type="text"]{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    margin-top:5px;
+    box-sizing:border-box;
+}
 
-        <p>Caption</p>
+input[type="file"]{
+    margin-top:10px;
+}
 
-        <textarea
-            name="caption"
-            rows="3"
-            style="width:100%"></textarea>
+button{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:10px 18px;
+    border-radius:6px;
+    cursor:pointer;
+    margin-top:10px;
+}
 
-        <br><br>
+button:hover{
+    background:#1d4ed8;
+}
 
-        <input
-            type="file"
-            name="image">
+.post-image{
+    width:100%;
+    border-radius:10px;
+    margin-bottom:10px;
+}
 
-        <br><br>
+.caption{
+    font-size:16px;
+    margin:10px 0;
+}
 
-        <button>
-            Upload
-        </button>
+.comment-box{
+    background:#f8f8f8;
+    padding:10px;
+    border-radius:6px;
+    margin-top:10px;
+}
 
-    </form>
+.comment-item{
+    padding:6px 0;
+    border-bottom:1px solid #ddd;
+}
 
-    <hr>
+.comment-item:last-child{
+    border-bottom:none;
+}
 
-    <h2>Feed</h2>
+.success{
+    background:#dcfce7;
+    color:#166534;
+    padding:10px;
+    border-radius:6px;
+    margin-bottom:20px;
+}
+
+.feed-title{
+    margin:25px 0 15px;
+}
+</style>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>📷 Upload Post</h2>
+
+        @if(session('success'))
+            <div class="success">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        <form action="{{ route('upload') }}"
+              method="POST"
+              enctype="multipart/form-data">
+
+            @csrf
+
+            <label>Caption</label>
+
+            <textarea
+                name="caption"
+                rows="3"></textarea>
+
+            <br>
+
+            <input
+                type="file"
+                name="image">
+
+            <br>
+
+            <button type="submit">
+                Upload
+            </button>
+
+        </form>
+
+    </div>
+
+    <h2 class="feed-title">📰 Feed</h2>
 
     @foreach($posts as $post)
 
-        <div style="margin-bottom:30px">
+    <div class="card">
 
-            <img
-                src="{{ asset('storage/'.$post->image) }}"
-                width="300">
+        <img
+            src="{{ asset('storage/'.$post->image) }}"
+            class="post-image">
 
-            <p>
+        <div class="caption">
+            {{ $post->caption }}
+        </div>
 
-                {{ $post->caption }}
+        <form action="{{ route('like', $post->id) }}" method="POST">
 
-            </p>
-            <form action="{{ route('like', $post->id) }}" method="POST">
+            @csrf
 
-                @csrf
+            <button type="submit">
+                ❤️ Like ({{ $post->likes->count() }})
+            </button>
 
-                <button type="submit">
-                    ❤️ Like ({{ $post->likes->count() }})
-                </button>
+        </form>
 
-            </form>
+        <hr style="margin:20px 0;">
 
-                        <hr>
+        <form action="{{ route('comment', $post->id) }}" method="POST">
 
-            <form action="{{ route('comment', $post->id) }}" method="POST">
+            @csrf
 
-                @csrf
+            <input
+                type="text"
+                name="comment"
+                placeholder="Tulis komentar...">
 
-                <input
-                    type="text"
-                    name="comment"
-                    placeholder="Tulis komentar">
+            <button type="submit">
+                Kirim
+            </button>
 
-                <button type="submit">
-                    Kirim
-                </button>
+        </form>
 
-            </form>
-            @foreach($post->comments as $comment)
+        <div class="comment-box">
 
-            <p>
+            @forelse($post->comments as $comment)
 
-                <b>{{ $comment->user->name }}</b>
+                <div class="comment-item">
+                    <strong>{{ $comment->user->name }}</strong>
+                    <br>
+                    {{ $comment->comment }}
+                </div>
 
-                : {{ $comment->comment }}
+            @empty
 
-            </p>
+                <p>Belum ada komentar.</p>
 
-        @endforeach
+            @endforelse
 
         </div>
+
+    </div>
 
     @endforeach
 
